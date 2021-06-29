@@ -188,7 +188,7 @@ const App: React.FC<AppProps> = (props) => {
     if (!combinedBounds) {
       combinedBounds = australiaBounds;
     }
-    map.fitBounds(combinedBounds, { padding: calculatePadding(), maxZoom: 8, duration: 2500 });
+    map.fitBounds(combinedBounds, { padding: calculatePadding(), duration: 2500 });
   };
   useEffect(showElectorate, [activeElectorates]);
   return (
