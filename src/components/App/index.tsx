@@ -48,10 +48,18 @@ const App: React.FC<AppProps> = (props) => {
       setActiveElectorates([marker.electorate])
     }
   }
-  let calculatePadding = () => {
-    if (!mapRef.current) return 5;
-    let rect = mapRef.current.getBoundingClientRect();
-    return Math.round(Math.min(rect.width, rect.height) * 0.1);
+  let calculatePadding = (): maplibregl.PaddingOptions => {
+    let padding = 5;
+    if (mapRef.current) {
+      let rect = mapRef.current.getBoundingClientRect();
+      padding = Math.round(Math.min(rect.width, rect.height) * 0.1);
+    }
+    return {
+      top: Math.max(padding, 70), // ensure there is enough room for a legend
+      left: padding,
+      right: padding,
+      bottom: padding,
+    };
   }
   let initMap = () => {
     if (mapRef.current && !initMapCalled) {
