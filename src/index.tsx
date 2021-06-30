@@ -8,16 +8,21 @@ import { render } from 'react-dom';
 import App, { MarkerData } from './components/App';
 import type { AppProps } from './components/App';
 
-let scrollyTellerDefinition: ScrollytellerDefinition<MarkerData>;
 
 let appMountEl: Mount;
 
 function renderApp() {
-  if (!scrollyTellerDefinition) {
-    scrollyTellerDefinition = loadScrollyteller('', 'u-full');
+  let name: number | null = 1;
+  while (name) {
+    try {
+      let scrollyTellerDefinition: ScrollytellerDefinition<MarkerData> = loadScrollyteller(name.toString(), 'u-full');
+      render(<App scrollyTellerDefinition={scrollyTellerDefinition} />, scrollyTellerDefinition.mountNode);
+      name++;
+    }
+    catch {
+      name = null;
+    }
   }
-  // scrollyTellerDefinition.panels = scrollyTellerDefinition.panels.map(data => ({ ...data, align: 'right' }));
-  render(<App scrollyTellerDefinition={scrollyTellerDefinition} />, scrollyTellerDefinition.mountNode);
 }
 
 whenOdysseyLoaded.then(() => {

@@ -80,13 +80,11 @@ const App: React.FC<AppProps> = (props) => {
         dragRotate: false,
         dragPan: false,
         touchZoomRotate: false,
-        // style: 'https://localhost:8080/style.json'
         style: { version: 8, layers: [], sources: {} } // blank
       });
       setMap(map);
       map.fitBounds(australiaBounds, { padding: calculatePadding() });
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-left');
-      // map.addControl(new maplibregl.AttributionControl({ customAttribution: '© ABC © AEC' }));
       map.on('load', () => {
         if (!map) return;
         map.addSource('electorates', {
