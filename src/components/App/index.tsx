@@ -109,9 +109,9 @@ const App: React.FC<AppProps> = (props) => {
               'interpolate',
               ['linear'],
               ['feature-state', 'agree'],
-              minAgree, '#00a3cf',
+              minAgree, '#4661cf',
               australiaAgree, '#ffffff',
-              maxAgree, '#e86b2b',
+              maxAgree, '#e87b07',
             ],
             'fill-opacity': 1
           }
