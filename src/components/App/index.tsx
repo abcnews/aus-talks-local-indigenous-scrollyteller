@@ -13,6 +13,8 @@ export type MarkerData = {
   electorate: string | string[],
 };
 
+type MapMarkerLookup = { [code: string]: maplibregl.Marker };
+
 let markerElectorate = (name: string) => name.toLowerCase().replace(/[^\w]+/g, '');
 
 const australiaAgree = 60.6;
@@ -30,13 +32,13 @@ for (let electorate of electorates) {
 
 let australiaBounds = new maplibregl.LngLatBounds([[112, -44], [156, -10]]); // Australia
 let australiaCentre = australiaBounds.getCenter();
-let mapMarkers: { [code: string]: maplibregl.Marker } = {};
 
 const App: React.FC<AppProps> = (props) => {
   let [activeElectorates, setActiveElectorates] = useState<string[]>([]);
   let [map, setMap] = useState<maplibregl.Map | null>(null);
   let mapRef = useRef<null | HTMLDivElement>(null);
   let [initMapCalled, setInitMapCalled] = useState(false);
+  let [mapMarkers, setMapMarkers] = useState<MapMarkerLookup>({});
   let onMarker = (marker: MarkerData) => {
     if (!marker.electorate) {
       setActiveElectorates([]);
@@ -127,6 +129,7 @@ const App: React.FC<AppProps> = (props) => {
             },
           }
         });
+        let newMapMarkers: MapMarkerLookup = {};
         for (let e of electorates) {
           map.setFeatureState({
             source: 'electorates',
@@ -143,8 +146,9 @@ const App: React.FC<AppProps> = (props) => {
           let marker = new maplibregl.Marker(div);
           marker.setLngLat(new maplibregl.LngLat(e.longitude, e.latitude))
           marker.addTo(map);
-          mapMarkers[e.code] = marker;
+          newMapMarkers[e.code] = marker;
         }
+        setMapMarkers(newMapMarkers);
       });
       map.on('mousedown', e => {
         let features = map.queryRenderedFeatures(e.point, { layers: ['electorates_fill'] });
