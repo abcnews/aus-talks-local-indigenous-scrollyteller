@@ -74,4 +74,23 @@
   }
 }
 
-
+// Odyssey overrides
+:global(.Block) {
+  background-color: #2e3638 !important;
+}
+:global(.Block-content > *) {
+  background-color: transparent !important;
+  &:first-child {
+    font-size: 1.75rem;
+    line-height: 1.1;
+    text-align: center;
+  }
+}
+@media only screen and (max-width: 768px) { // mobile
+  iframe[src*="lookup"] {
+    margin-left: -1.75rem !important;
+    margin-right: -1.75rem !important;
+    width: calc(100% + 1.75rem + 1.75rem) !important;
+    max-width: none !important;
+  }
+}
