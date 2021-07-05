@@ -210,6 +210,7 @@ const App: React.FC<AppProps> = (props) => {
           <span className="scale"></span>
           <span className="label">More known</span>
         </div>
+        <div className="credits">Developer: Andrew Kesper. Electorate boundaries © AEC.</div>
       </div>
     </Scrollyteller>
   );
