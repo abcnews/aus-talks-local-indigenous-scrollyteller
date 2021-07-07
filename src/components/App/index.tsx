@@ -10,7 +10,8 @@ export type AppProps = {
 };
 
 export type MarkerData = {
-  electorate: string | string[],
+  electorate?: string | string[],
+  background?: boolean,
 };
 
 type MapMarkerLookup = { [code: string]: maplibregl.Marker };
@@ -35,6 +36,7 @@ let australiaCentre = australiaBounds.getCenter();
 
 const App: React.FC<AppProps> = (props) => {
   let [activeElectorates, setActiveElectorates] = useState<string[]>([]);
+  let [background, setBackground] = useState(true);
   let [map, setMap] = useState<maplibregl.Map | null>(null);
   let mapRef = useRef<null | HTMLDivElement>(null);
   let [initMapCalled, setInitMapCalled] = useState(false);
@@ -48,6 +50,9 @@ const App: React.FC<AppProps> = (props) => {
     }
     else {
       setActiveElectorates([marker.electorate])
+    }
+    if (marker.background !== undefined) {
+      setBackground(marker.background);
     }
   }
   let calculatePadding = (): maplibregl.PaddingOptions => {
@@ -203,7 +208,7 @@ const App: React.FC<AppProps> = (props) => {
   useEffect(showElectorate, [activeElectorates]);
   return (
     <Scrollyteller panels={props.scrollyTellerDefinition.panels} onMarker={onMarker}>
-      <div className={styles['aus-talks-local-indigenous-scrollyteller']}>
+      <div className={styles['aus-talks-local-indigenous-scrollyteller']} data-background={background ? 'true' : 'false'}>
         <div className="map" ref={mapRef} />
         <div className="legend">
           <span className="label">Less known</span>
