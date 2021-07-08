@@ -121,7 +121,7 @@ const App: React.FC<AppProps> = (props) => {
         style: { version: 8, layers: [], sources: {} } // blank
       });
       setMap(map);
-      showElectorate();
+      map.fitBounds(australiaBounds, { padding: calculatePadding() });
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-left');
       map.on('load', () => {
         if (!map) return;
