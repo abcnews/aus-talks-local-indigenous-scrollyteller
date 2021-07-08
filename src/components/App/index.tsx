@@ -40,6 +40,7 @@ const App: React.FC<AppProps> = (props) => {
   let [map, setMap] = useState<maplibregl.Map | null>(null);
   let mapRef = useRef<null | HTMLDivElement>(null);
   let [initMapCalled, setInitMapCalled] = useState(false);
+  let [mapIsLoaded, setMapIsLoaded] = useState(false);
   let [mapMarkers, setMapMarkers] = useState<MapMarkerLookup>({});
   let onMarker = (marker: MarkerData) => {
     if (!marker.electorate) {
@@ -68,6 +69,36 @@ const App: React.FC<AppProps> = (props) => {
       bottom: padding,
     };
   }
+  let showElectorate = () => {
+    if (!map || !mapIsLoaded) return;
+    let activeElectorateCodes = new Set<string>();
+    let combinedBounds: maplibregl.LngLatBounds | null = null;
+    for (let name of activeElectorates) {
+      let e = electorateLookup[name];
+      if (e) {
+        activeElectorateCodes.add(e.code);
+        let eBounds = new maplibregl.LngLatBounds([[e.west, e.south], [e.east, e.north]]);
+        if (!combinedBounds) {
+          combinedBounds = eBounds;
+        }
+        else {
+          combinedBounds.extend(eBounds);
+        }
+      }
+    }
+    for (let e of electorates) {
+      let active = activeElectorateCodes.has(e.code);
+      map.setFeatureState({ source: 'electorates', sourceLayer: 'federalelectorates2019', id: e.code }, { active });
+      if (mapMarkers[e.code]) {
+        mapMarkers[e.code].getElement().hidden = !active;
+      }
+    }
+    if (!combinedBounds) {
+      combinedBounds = australiaBounds;
+    }
+    map.fitBounds(combinedBounds, { padding: calculatePadding(), duration: 2500 });
+  };
+  useEffect(showElectorate, [activeElectorates]);
   let initMap = () => {
     if (mapRef.current && !initMapCalled) {
       setInitMapCalled(true);
@@ -90,10 +121,11 @@ const App: React.FC<AppProps> = (props) => {
         style: { version: 8, layers: [], sources: {} } // blank
       });
       setMap(map);
-      map.fitBounds(australiaBounds, { padding: calculatePadding() });
+      showElectorate();
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-left');
       map.on('load', () => {
         if (!map) return;
+        setMapIsLoaded(true);
         map.addSource('electorates', {
           type: 'vector',
           tiles: [
@@ -176,36 +208,6 @@ const App: React.FC<AppProps> = (props) => {
     }
   };
   useEffect(initMap, [mapRef]);
-  let showElectorate = () => {
-    if (!map) return;
-    let activeElectorateCodes = new Set<string>();
-    let combinedBounds: maplibregl.LngLatBounds | null = null;
-    for (let name of activeElectorates) {
-      let e = electorateLookup[name];
-      if (e) {
-        activeElectorateCodes.add(e.code);
-        let eBounds = new maplibregl.LngLatBounds([[e.west, e.south], [e.east, e.north]]);
-        if (!combinedBounds) {
-          combinedBounds = eBounds;
-        }
-        else {
-          combinedBounds.extend(eBounds);
-        }
-      }
-    }
-    for (let e of electorates) {
-      let active = activeElectorateCodes.has(e.code);
-      map.setFeatureState({ source: 'electorates', sourceLayer: 'federalelectorates2019', id: e.code }, { active });
-      if (mapMarkers[e.code]) {
-        mapMarkers[e.code].getElement().hidden = !active;
-      }
-    }
-    if (!combinedBounds) {
-      combinedBounds = australiaBounds;
-    }
-    map.fitBounds(combinedBounds, { padding: calculatePadding(), duration: 2500 });
-  };
-  useEffect(showElectorate, [activeElectorates]);
   return (
     <Scrollyteller panels={props.scrollyTellerDefinition.panels} onMarker={onMarker}>
       <div className={styles['aus-talks-local-indigenous-scrollyteller']} data-background={background ? 'true' : 'false'}>
